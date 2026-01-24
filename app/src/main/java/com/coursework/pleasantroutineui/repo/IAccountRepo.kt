@@ -1,6 +1,9 @@
 package com.coursework.pleasantroutineui.repo
 
+import com.coursework.pleasantroutineui.domain.User
+
 interface IAccountRepo {
+    fun getUser(num: Int): User
     fun getId(): String
     fun getName(): String
     fun getSurname(): String

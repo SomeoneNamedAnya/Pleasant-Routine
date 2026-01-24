@@ -81,6 +81,7 @@ fun DrawerContent(
 
         MenuList(navController, Destinations.USER_ACCOUNT_PAGE,"Профиль")
         MenuList(navController, Destinations.LOGIN_PAGE, "Вход")
+        MenuList(navController, Destinations.USER_ROOM_PAGE, "Моя комната")
 
     }
 }

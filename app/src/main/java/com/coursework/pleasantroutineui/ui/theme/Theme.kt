@@ -16,7 +16,7 @@ private val DarkColorScheme = darkColorScheme(
 
 private val LightColorScheme = lightColorScheme(
     primary = DustyOlive,
-    //secondary = OliveLeaf,
+    secondary = LightBronze,
    // tertiary = OliveLeaf,
     background = DesertSand,
     onBackground = DarkOlive,

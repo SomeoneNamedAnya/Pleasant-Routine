@@ -26,8 +26,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,39 +55,11 @@ import kotlinx.coroutines.launch
 class AccountInfoViewModel (
     private val repository: IAccountRepo
 ): ViewModel() {
-    var id = liveData {
-        emit(repository.getId())
-    }
-    var fullName = liveData {
-        emit(repository.getName() + " " +
-                repository.getSurname() + " " +
-                repository.getLastname())
+
+    var user = liveData {
+        emit(repository.getUser(1))
     }
 
-    var dateOfBirth = liveData {
-        emit(repository.getDateOfBirth())
-    }
-    var email = liveData {
-        emit(repository.getEmail())
-    }
-    var roomNumber = liveData {
-        emit(repository.getRoomNumber())
-    }
-    var department = liveData {
-        emit(repository.getDepartment())
-    }
-    var educationalProgram = liveData {
-        emit(repository.getEducationalProgram())
-    }
-    var educationLevel = liveData {
-        emit(repository.getEducationLevel())
-    }
-    var selfInfo = liveData {
-        emit(repository.getSelfInfo())
-    }
-    var photoLink = liveData {
-        emit(repository.getPhotoLink())
-    }
 
 }
 @Composable
@@ -154,16 +129,37 @@ fun AccountInfoScreen(navController: NavController, vm: AccountInfoViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
 
                 ) {
-                    val photoLink by vm.photoLink.observeAsState()
-                    val userId by vm.id.observeAsState()
-                    val userFullName by vm.fullName.observeAsState()
-                    val userDateOfBirth by vm.dateOfBirth.observeAsState()
-                    val userEmail by vm.email.observeAsState()
-                    val userRoomNumber by vm.roomNumber.observeAsState()
-                    val userDepartment by vm.department.observeAsState()
-                    val userEducationalProgram by vm.educationalProgram.observeAsState()
-                    val userEducationLevel by vm.educationLevel.observeAsState()
-                    val userSelfInfo by vm.selfInfo.observeAsState()
+                    val user by vm.user.observeAsState()
+                    val photoLink by remember(user) {
+                        derivedStateOf { user?.photoLink }
+                    }
+                    val userId by remember(user) {
+                        derivedStateOf { user?.id}
+                    }
+                    val userFullName by remember(user) {
+                        derivedStateOf { user?.firstName + " " + user?.surname + " " + user?.lastName}
+                    }
+                    val userDateOfBirth by remember(user) {
+                        derivedStateOf { user?.dateOfBirth}
+                    }
+                    val userEmail by remember(user) {
+                        derivedStateOf { user?.email}
+                    }
+                    val userRoomNumber by remember(user) {
+                        derivedStateOf { user?.roomNumber}
+                    }
+                    val userDepartment by remember(user) {
+                        derivedStateOf { user?.department}
+                    }
+                    val userEducationalProgram by remember(user) {
+                        derivedStateOf { user?.educationalProgram}
+                    }
+                    val userEducationLevel by remember(user) {
+                        derivedStateOf { user?.educationLevel}
+                    }
+                    val userSelfInfo by remember(user) {
+                        derivedStateOf { user?.selfInfo}
+                    }
 
 
                     val clipboard = LocalClipboard.current
