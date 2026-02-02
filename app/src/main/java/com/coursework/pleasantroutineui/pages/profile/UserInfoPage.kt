@@ -1,4 +1,4 @@
-package com.coursework.pleasantroutineui.pages
+package com.coursework.pleasantroutineui.pages.profile
 
 import android.content.ClipData
 import android.util.Log
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -29,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -40,60 +38,42 @@ import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.switchMap
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.coursework.pleasantroutineui.ui_services.DrawerContent
 import com.coursework.pleasantroutineui.ui_services.ProfileTopBar
 import com.coursework.pleasantroutineui.R
-import com.coursework.pleasantroutineui.repo.IAccountRepo
+import com.coursework.pleasantroutineui.repo.interfaces.IAccountRepo
+import com.coursework.pleasantroutineui.ui_services.InfoRow
 
 import kotlinx.coroutines.launch
 
 
-class AccountInfoViewModel (
+class AllUserInfoViewModel (
     private val repository: IAccountRepo
 ): ViewModel() {
+    private val userId = MutableLiveData<String>()
+    val user = userId.switchMap { id ->
+        liveData {
+            emit(repository.getUser(id))
+        }
+    }
 
-    var user = liveData {
-        emit(repository.getUser(1))
+    fun loadUser(id: String) {
+        userId.value = id
     }
 
 
 }
-@Composable
-fun InfoRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 15.dp, start = 15.dp, end = 15.dp)
-    ) {
-
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.width(120.dp)
-        )
-
-       Spacer(modifier = Modifier.width(50.dp))
-
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
-        )
-
-    }
-}
-
 
 @Composable
-fun AccountInfoScreen(navController: NavController, vm: AccountInfoViewModel) {
+fun AccountInfoScreen(id: String, navController: NavController, vm: AllUserInfoViewModel) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -129,6 +109,7 @@ fun AccountInfoScreen(navController: NavController, vm: AccountInfoViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
 
                 ) {
+                    vm.loadUser(id)
                     val user by vm.user.observeAsState()
                     val photoLink by remember(user) {
                         derivedStateOf { user?.photoLink }

@@ -8,6 +8,7 @@ android {
     namespace = "com.coursework.pleasantroutineui"
     compileSdk {
         version = release(36)
+
     }
 
     defaultConfig {
@@ -42,6 +43,8 @@ android {
 }
 
 dependencies {
+
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -68,3 +71,4 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
 
 }
+

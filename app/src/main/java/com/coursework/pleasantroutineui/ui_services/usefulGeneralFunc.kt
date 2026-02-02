@@ -28,8 +28,6 @@ fun ProfileTopBar(
     onEditClick: () -> Unit
 ) {
     TopAppBar(
-        //modifier = Modifier.height(80.dp).,
-
         colors = TopAppBarColors(
             containerColor = MaterialTheme.colorScheme.onPrimary,
             scrolledContainerColor = MaterialTheme.colorScheme.onPrimary,

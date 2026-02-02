@@ -1,8 +1,8 @@
 package com.coursework.pleasantroutineui
 
 import androidx.lifecycle.ViewModel
-import com.coursework.pleasantroutineui.pages.AccountInfoViewModel
-import com.coursework.pleasantroutineui.repo.IAccountRepo
+import com.coursework.pleasantroutineui.pages.profile.AccountInfoViewModel
+import com.coursework.pleasantroutineui.repo.interfaces.IAccountRepo
 
 class AccountInfoViewModelFactory(
     private val repository: IAccountRepo

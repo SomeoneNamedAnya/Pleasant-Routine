@@ -1,4 +1,4 @@
-package com.coursework.pleasantroutineui.repo
+package com.coursework.pleasantroutineui.repo.interfaces
 
 import com.coursework.pleasantroutineui.domain.User
 

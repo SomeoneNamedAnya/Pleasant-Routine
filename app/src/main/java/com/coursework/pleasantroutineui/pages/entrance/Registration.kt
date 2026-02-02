@@ -1,9 +1,5 @@
-package com.coursework.pleasantroutineui.pages
-import android.os.Bundle
+package com.coursework.pleasantroutineui.pages.entrance
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,8 +12,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
@@ -28,23 +22,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
-import com.coursework.pleasantroutineui.App
 import com.coursework.pleasantroutineui.domain.Destinations
-import com.coursework.pleasantroutineui.ui.theme.PleasantRoutineUiTheme
+import com.coursework.pleasantroutineui.ui_services.RegisterField
 
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            PleasantRoutineUiTheme(darkTheme = false) {
-                App()
-            }
-        }
-
-    }
-}
 
 class RegistrationViewModel: ViewModel() {
     var login by mutableStateOf("")
@@ -110,33 +90,3 @@ fun RegistrationScreen(nController: NavController, vm: RegistrationViewModel = v
         }
     }
 }
-
-@Composable
-fun RegisterField(textField: String, field: String, onFieldChanged: (String) -> Unit,
-                  visualTransformation: VisualTransformation = VisualTransformation.None,
-                  trailingIcon: @Composable (() -> Unit)? = null)  {
-
-    OutlinedTextField(
-        value = field,
-        onValueChange = onFieldChanged,
-        label = { Text(textField) },
-
-        placeholder = { Text("Введите ${textField.lowercase()}") },
-        singleLine = true,
-        colors = OutlinedTextFieldDefaults.colors(
-            cursorColor = MaterialTheme.colorScheme.onBackground,
-            focusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-            unfocusedLabelColor = MaterialTheme.colorScheme.onPrimary,
-            focusedBorderColor = MaterialTheme.colorScheme.surface,
-            unfocusedBorderColor = MaterialTheme.colorScheme.surface,
-            focusedTextColor = MaterialTheme.colorScheme.onBackground,
-            unfocusedTextColor = MaterialTheme.colorScheme.onBackground
-        ),
-        visualTransformation = visualTransformation,
-        trailingIcon = trailingIcon
-
-    )
-
-}
-
-
