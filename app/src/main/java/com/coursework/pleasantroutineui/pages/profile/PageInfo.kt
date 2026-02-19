@@ -47,6 +47,7 @@ import com.coursework.pleasantroutineui.ui_services.ProfileTopBar
 import com.coursework.pleasantroutineui.R
 import com.coursework.pleasantroutineui.repo.interfaces.IAccountRepo
 import com.coursework.pleasantroutineui.ui_services.InfoRow
+import com.coursework.pleasantroutineui.ui_services.Menue
 
 import kotlinx.coroutines.launch
 
@@ -67,181 +68,161 @@ fun AccountInfoScreen(navController: NavController, vm: AccountInfoViewModel) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            DrawerContent(
-                navController,
-                onItemClick = {
-                    scope.launch { drawerState.close() }
-                }
-            )
-        }
-    ) {
-        Scaffold(
-            modifier = Modifier.padding(top = 50.dp),
-            topBar = {
-                ProfileTopBar(
-                    title = "Профиль",
-                    onMenuClick = { scope.launch { drawerState.open() } },
-                    onEditClick = { /* перейти в редактирование */ }
-                )
-            }
-        ) { paddingValues ->
+    Menue("Информация", false, navController) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
             Column(
                 modifier = Modifier
-                    .padding(paddingValues)
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .padding(top = 50.dp, bottom = 20.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                horizontalAlignment = Alignment.CenterHorizontally
+
             ) {
-                Column(
+                val user by vm.user.observeAsState()
+                val photoLink by remember(user) {
+                    derivedStateOf { user?.photoLink }
+                }
+                val userId by remember(user) {
+                    derivedStateOf { user?.id}
+                }
+                val userFullName by remember(user) {
+                    derivedStateOf { user?.firstName + " " + user?.surname + " " + user?.lastName}
+                }
+                val userDateOfBirth by remember(user) {
+                    derivedStateOf { user?.dateOfBirth}
+                }
+                val userEmail by remember(user) {
+                    derivedStateOf { user?.email}
+                }
+                val userRoomNumber by remember(user) {
+                    derivedStateOf { user?.roomNumber}
+                }
+                val userDepartment by remember(user) {
+                    derivedStateOf { user?.department}
+                }
+                val userEducationalProgram by remember(user) {
+                    derivedStateOf { user?.educationalProgram}
+                }
+                val userEducationLevel by remember(user) {
+                    derivedStateOf { user?.educationLevel}
+                }
+                val userSelfInfo by remember(user) {
+                    derivedStateOf { user?.selfInfo}
+                }
+
+
+                val clipboard = LocalClipboard.current
+                val scope = rememberCoroutineScope()
+                Spacer(modifier = Modifier.height(15.dp))
+                AsyncImage(
+                    model = photoLink,
+                    onError = {
+                        Log.e(
+                            "AsyncImage",
+                            "Failed to load image: ${it.result.throwable}"
+                        )
+                    },
+                    contentDescription = "Example Image",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 50.dp, bottom = 20.dp)
-                        .background(MaterialTheme.colorScheme.background),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                        .size(150.dp)
+                        .clip(CircleShape),
+                    placeholder = painterResource(id = R.drawable.no_photo), // Replace with your placeholder drawable
+                    error = painterResource(id = R.drawable.no_photo)  // Replace with your error drawable
+                )
 
-                ) {
-                    val user by vm.user.observeAsState()
-                    val photoLink by remember(user) {
-                        derivedStateOf { user?.photoLink }
-                    }
-                    val userId by remember(user) {
-                        derivedStateOf { user?.id}
-                    }
-                    val userFullName by remember(user) {
-                        derivedStateOf { user?.firstName + " " + user?.surname + " " + user?.lastName}
-                    }
-                    val userDateOfBirth by remember(user) {
-                        derivedStateOf { user?.dateOfBirth}
-                    }
-                    val userEmail by remember(user) {
-                        derivedStateOf { user?.email}
-                    }
-                    val userRoomNumber by remember(user) {
-                        derivedStateOf { user?.roomNumber}
-                    }
-                    val userDepartment by remember(user) {
-                        derivedStateOf { user?.department}
-                    }
-                    val userEducationalProgram by remember(user) {
-                        derivedStateOf { user?.educationalProgram}
-                    }
-                    val userEducationLevel by remember(user) {
-                        derivedStateOf { user?.educationLevel}
-                    }
-                    val userSelfInfo by remember(user) {
-                        derivedStateOf { user?.selfInfo}
-                    }
+                Spacer(modifier = Modifier.height(15.dp))
+                userId?.let {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
 
-
-                    val clipboard = LocalClipboard.current
-                    val scope = rememberCoroutineScope()
-                    Spacer(modifier = Modifier.height(15.dp))
-                    AsyncImage(
-                        model = photoLink,
-                        onError = {
-                            Log.e(
-                                "AsyncImage",
-                                "Failed to load image: ${it.result.throwable}"
-                            )
-                        },
-                        contentDescription = "Example Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(150.dp)
-                            .clip(CircleShape),
-                        placeholder = painterResource(id = R.drawable.no_photo), // Replace with your placeholder drawable
-                        error = painterResource(id = R.drawable.no_photo)  // Replace with your error drawable
-                    )
-
-                    Spacer(modifier = Modifier.height(15.dp))
-                    userId?.let {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
-
-                            ) {
-                            Text(
-                                text = it,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                            IconButton(
-                                onClick = {
-                                    scope.launch {
-                                        clipboard.setClipEntry(
-                                            ClipEntry(
-                                                ClipData.newPlainText(
-                                                    it,
-                                                    it
-                                                )
-                                            )
-                                        )
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.outline_content_copy_24),
-                                    contentDescription = "Скопировать",
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
-
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(15.dp))
-
-                    userFullName?.let {
+                        ) {
                         Text(
                             text = it,
                             color = MaterialTheme.colorScheme.onBackground,
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleSmall
                         )
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    clipboard.setClipEntry(
+                                        ClipEntry(
+                                            ClipData.newPlainText(
+                                                it,
+                                                it
+                                            )
+                                        )
+                                    )
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.outline_content_copy_24),
+                                contentDescription = "Скопировать",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+
                     }
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 15.dp),
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-
-                    InfoRow("О себе:", "")
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 15.dp, start = 20.dp, end = 15.dp)
-                    ) {
-
-                        Text(
-                            text = userSelfInfo ?: "—",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 15.dp),
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-
-                    InfoRow("Дата рождения:", userDateOfBirth ?: "Не указано")
-                    InfoRow("Учебная почта:", userEmail ?: "Не указано")
-                    InfoRow("Номер комнаты:", userRoomNumber ?: "Не указано")
-                    InfoRow("Факультет:", userDepartment ?: "Не указано")
-                    InfoRow("Образовательная программа:", userEducationalProgram ?: "Не указано")
-                    InfoRow("Уровень обучения:", userEducationLevel ?: "Не указано")
-
-
                 }
+
+                Spacer(modifier = Modifier.height(15.dp))
+
+                userFullName?.let {
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 15.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
+                InfoRow("О себе:", "")
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 15.dp, start = 20.dp, end = 15.dp)
+                ) {
+
+                    Text(
+                        text = userSelfInfo ?: "—",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(top = 15.dp, start = 15.dp, end = 15.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+
+                InfoRow("Дата рождения:", userDateOfBirth ?: "Не указано")
+                InfoRow("Учебная почта:", userEmail ?: "Не указано")
+                InfoRow("Номер комнаты:", userRoomNumber ?: "Не указано")
+                InfoRow("Факультет:", userDepartment ?: "Не указано")
+                InfoRow("Образовательная программа:", userEducationalProgram ?: "Не указано")
+                InfoRow("Уровень обучения:", userEducationLevel ?: "Не указано")
+
+
             }
         }
-
     }
+
+
 }
 
 

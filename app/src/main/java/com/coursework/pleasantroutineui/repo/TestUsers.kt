@@ -39,7 +39,7 @@ class TestUsers: IUsers {
             "Факультет кошачих наук",
             "Программная инженерия",
             "1 курс",
-            "Люблю играть, мурчать и кушать криветки))))",
+            "Люблю играть, мурчать и кушать креветки))))",
             "https://drive.google.com/uc?export=download&id=1OJJrSNP3qSa_5Rjnj4B8nFYU7_CpK35f")
     )
 
@@ -50,4 +50,6 @@ class TestUsers: IUsers {
     override fun getOneUser(num: String): User {
         return usersArr[num.toInt()]
     }
+
+
 }

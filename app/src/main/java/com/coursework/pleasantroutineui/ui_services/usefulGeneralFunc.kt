@@ -24,6 +24,7 @@ import com.coursework.pleasantroutineui.domain.Destinations
 @Composable
 fun ProfileTopBar(
     title: String,
+    isEditButton: Boolean,
     onMenuClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
@@ -48,12 +49,15 @@ fun ProfileTopBar(
             }
         },
         actions = {
-            IconButton(onClick = onEditClick) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Редактировать"
-                )
+            if (isEditButton) {
+                IconButton(onClick = onEditClick) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Редактировать"
+                    )
+                }
             }
+
         }
     )
 }
@@ -77,20 +81,21 @@ fun DrawerContent(
         )
 
 
-        MenuList(navController, Destinations.USER_ACCOUNT_PAGE,"Профиль")
-        MenuList(navController, Destinations.LOGIN_PAGE, "Вход")
-        MenuList(navController, Destinations.USER_ROOM_PAGE, "Моя комната")
+        MenuList(navController, Destinations.USER_ACCOUNT_PAGE.title,"Профиль")
+        MenuList(navController, Destinations.USER_ROOM_PAGE.title, "Моя комната")
+        MenuList(navController, Destinations.PERSONAL_ARCHIVE_PAGE.title + "/0", "Личный архив")
+        MenuList(navController, Destinations.LOGIN_PAGE.title, "Вход")
 
     }
 }
 
 @Composable
 fun MenuList(navController: NavController,
-             destination: Destinations,
+             destination: String,
              listName: String) {
     NavigationDrawerItem(
         label = { Text(listName) },
-        selected = (navController.currentDestination?.route == destination.title),
+        selected = (navController.currentDestination?.route == destination),
         colors = NavigationDrawerItemDefaults.colors(
             selectedContainerColor = MaterialTheme.colorScheme.surface,
             selectedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -101,6 +106,6 @@ fun MenuList(navController: NavController,
             unselectedIconColor = MaterialTheme.colorScheme.onSurface,
 
         ),
-        onClick = { navController.navigate(destination.title) }
+        onClick = { navController.navigate(destination) }
     )
 }
