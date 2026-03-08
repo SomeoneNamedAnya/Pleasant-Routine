@@ -1,4 +1,4 @@
-package com.coursework.pleasantroutineui
+package com.coursework.pleasantroutineui.vm_factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

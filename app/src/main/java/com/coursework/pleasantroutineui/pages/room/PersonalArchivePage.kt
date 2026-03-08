@@ -8,20 +8,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.coursework.pleasantroutineui.repo.interfaces.INotesRepo
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
-import RoomUserPreview
-import android.content.ClipData
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,47 +19,29 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.navigation.NavController
-import com.coursework.pleasantroutineui.repo.interfaces.IRoomRepo
-import com.coursework.pleasantroutineui.ui_services.DrawerContent
 import com.coursework.pleasantroutineui.ui_services.Menue
-import com.coursework.pleasantroutineui.ui_services.ProfileTopBar
-import kotlinx.coroutines.launch
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ChipColors
-import androidx.compose.material3.DatePickerColors
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -82,25 +54,14 @@ import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.key.type
-import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
-import androidx.wear.compose.material.Chip
-import androidx.wear.compose.material.ChipDefaults.primaryChipColors
 import com.coursework.pleasantroutineui.R
-import com.coursework.pleasantroutineui.domain.Button
 import com.coursework.pleasantroutineui.domain.Destinations
 import com.coursework.pleasantroutineui.domain.Note
-import com.coursework.pleasantroutineui.pages.ExpandableContainer
+import com.coursework.pleasantroutineui.domain.User
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -122,6 +83,12 @@ class PersonalArchivePageViewModel (
         }
     }
 
+    var allUsers = accountId.switchMap { id ->
+        liveData {
+            emit(repository.getAllUsers(id))
+        }
+    }
+
 
     fun loadAccountId(id: String) {
         accountId.value = id
@@ -136,6 +103,9 @@ fun PersonalArchivePage(id: String, navController: NavController, vm: PersonalAr
 
     vm.loadAccountId(id)
     val allNotes by vm.allNotes.observeAsState()
+    val allTags by vm.allTags.observeAsState()
+    val allUser by vm.allUsers.observeAsState()
+    val allUserString = allUser?.map{it.firstName + " " + it.surname}?.toTypedArray()
 
 
     Menue("Мои заметки", false, navController) { paddingValues ->
@@ -147,26 +117,30 @@ fun PersonalArchivePage(id: String, navController: NavController, vm: PersonalAr
             mutableStateOf(false)
         }
         var selectedItems by remember { mutableStateOf(setOf<String>()) }
+
         var startDate by remember { mutableStateOf<Long?>(null) }
         var endDate by remember { mutableStateOf<Long?>(null) }
         Column (modifier = Modifier.padding(paddingValues)) {
             Spacer(modifier = Modifier.height(10.dp))
 
             ComplexFilter(
-                vm,
+                allTags,
+                allUserString,
+                null,
+                {},
                 selectedItems,
+                onSelectedItemsUpdate = { newSet ->
+                    selectedItems = newSet
+                },
                 startDate,
-                endDate,
                 onStartDateUpdate = {
                     newStartDate ->
                     startDate = newStartDate
                 },
+                endDate,
                 onEndDateUpdate = {
                         newEndDate ->
                     endDate = newEndDate
-                },
-                onUpdate = { newSet ->
-                    selectedItems = newSet
                 }
             )
 
@@ -214,7 +188,7 @@ fun PersonalArchivePage(id: String, navController: NavController, vm: PersonalAr
                             flagDate = true
                         }
                         if (flagTag && flagDate) {
-                            NotePreview(allNotes!![item], 200.dp, navController)
+                            NotePreview(allNotes!![item], 250.dp, navController)
                             Spacer(modifier = Modifier.height(10.dp))
                         }
 
@@ -229,16 +203,20 @@ fun PersonalArchivePage(id: String, navController: NavController, vm: PersonalAr
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComplexFilter(vm: PersonalArchivePageViewModel,
-                  selectedItems: Set<String>,
-                  startDate: Long?,
-                  endDate: Long?,
-                  onStartDateUpdate: (Long?) -> Unit,
-                  onEndDateUpdate: (Long?) -> Unit,
+fun ComplexFilter(
+            allTags: Array<String>?,
+            allOwner: Array<String>?,
+            selectedOwners: Set<String>?,
+            onSelectedUserUpdate:  (Set<String>) -> Unit,
+            selectedItems: Set<String>,
+            onSelectedItemsUpdate: (Set<String>) -> Unit,
+            startDate: Long?,
+            onStartDateUpdate: (Long?) -> Unit,
+            endDate: Long?,
+            onEndDateUpdate: (Long?) -> Unit
+) {
 
-                  onUpdate: (Set<String>) -> Unit) {
-    val allTags by vm.allTags.observeAsState()
-    var expanded by remember { mutableStateOf(false) }
+
 
     Column {
 
@@ -253,7 +231,9 @@ fun ComplexFilter(vm: PersonalArchivePageViewModel,
 
             Button(
                 shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.height(40.dp).weight(2f),
+                modifier = Modifier
+                    .height(40.dp)
+                    .weight(2f),
                 onClick = { showDialog = true }
             ) {
                 Text(
@@ -306,120 +286,35 @@ fun ComplexFilter(vm: PersonalArchivePageViewModel,
             }
         }
         Spacer(modifier = Modifier.height(10.dp))
+        MultiSelectList(
+            allTags,
+            selectedItems,
+            onSelectedItemsUpdate
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        if (selectedOwners != null) {
+            MultiSelectList(
+                allOwner,
+                selectedOwners,
+                onSelectedUserUpdate
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+        }
+
+
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp)
-        ) {
-
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.weight(2f)
-                ) {
-
-                TextField(
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surface,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.surface,
-                        unfocusedIndicatorColor = MaterialTheme.colorScheme.surface,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        cursorColor = MaterialTheme.colorScheme.onSurface
-                    ),
-                    value = "Tags",
-                    onValueChange = {},
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                    },
-                    modifier = Modifier.menuAnchor(
-                        type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                        enabled = true
-                    ).height(50.dp)
-                )
-
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    containerColor = MaterialTheme.colorScheme.surface
-                ) {
-                    allTags?.forEach { option ->
-                        if (!selectedItems.contains(option)) {
-                            DropdownMenuItem(
-                                colors = MenuItemColors(
-                                    textColor = MaterialTheme.colorScheme.onSurface,
-                                    leadingIconColor = MaterialTheme.colorScheme.onSurface,
-                                    trailingIconColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
-                                ),
-                                text = { Text(option) },
-//
-                                onClick = {
-                                    onUpdate(
-                                        if (selectedItems.contains(option)) {
-
-                                            selectedItems - option
-                                        } else {
-                                            selectedItems + option
-                                        }
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-
-
-            }
-            val scrollState = rememberScrollState()
-            Box(
-                modifier = Modifier
-                    .weight(4f)
-                    .height(80.dp)
-            ) {
-                FlowRow(
-
-                    modifier = Modifier
-                        .verticalScroll(scrollState),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    allTags?.forEach { tag ->
-                        if (selectedItems.contains(tag)) {
-
-
-                            AssistChip(
-                                onClick = { onUpdate(selectedItems - tag)},
-                                label = { Text(tag, color = MaterialTheme.colorScheme.onSurface) },
-                                colors = ChipColors(
-                                    labelColor = MaterialTheme.colorScheme.onSurface,
-                                    containerColor = MaterialTheme.colorScheme.surface,
-                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurface,
-                                    trailingIconContentColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledContainerColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledLeadingIconContentColor = MaterialTheme.colorScheme.onSurface,
-                                    disabledTrailingIconContentColor = MaterialTheme.colorScheme.onSurface
-                                )
-                            )
-                        }
-                    }
-                }
-            }
-        }
-        Spacer(modifier = Modifier.width(10.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
+                .padding(start = 10.dp, end = 10.dp),
 
         ) {
             Button(
                 shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.height(40.dp).weight(1f),
-                onClick = { onUpdate(emptySet())
+                modifier = Modifier
+                    .height(40.dp)
+                    .weight(1f),
+                onClick = { onSelectedItemsUpdate(emptySet())
                             onStartDateUpdate(null)
                             onEndDateUpdate(null)
                 }
@@ -431,7 +326,9 @@ fun ComplexFilter(vm: PersonalArchivePageViewModel,
 
             Button(
                 shape = RoundedCornerShape(4.dp),
-                modifier = Modifier.height(40.dp).weight(1f),
+                modifier = Modifier
+                    .height(40.dp)
+                    .weight(1f),
                 onClick = { }
             ) {
                 Text("Создать заметку", color = MaterialTheme.colorScheme.onSurface)
@@ -439,11 +336,6 @@ fun ComplexFilter(vm: PersonalArchivePageViewModel,
         }
     }
 
-
-
-
-
-    //}
 }
 
 
@@ -562,8 +454,10 @@ fun NotePreview(note: Note, height: Dp, navController: NavController) {
         Row(
             modifier = Modifier
                 .padding(start = 10.dp, end = 10.dp)
-                .background(color = MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(16.dp))
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(16.dp)
+                )
         ) {
             Column(
                 modifier = Modifier
@@ -575,6 +469,9 @@ fun NotePreview(note: Note, height: Dp, navController: NavController) {
                 Text("Дата редактирования: " + note.lastEditTime, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(note.title, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(5.dp))
+                val users = note.owner.joinToString(", ") { "${it.firstName} ${it.surname}" }
+                Text("Редакторы: $users", color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.height(5.dp))
 
 
@@ -622,7 +519,9 @@ fun NotePreview(note: Note, height: Dp, navController: NavController) {
                     Icon(
                         painter = painterResource(R.drawable.share),
                         contentDescription = "Поделиться",
-                        modifier = Modifier.size(20.dp).background(MaterialTheme.colorScheme.onSurface)
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
 
@@ -634,7 +533,9 @@ fun NotePreview(note: Note, height: Dp, navController: NavController) {
                     Icon(
                         painter = painterResource(R.drawable.edit),
                         contentDescription = "Редактировать",
-                        modifier = Modifier.size(20.dp).background(MaterialTheme.colorScheme.onSurface)
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
 
@@ -647,54 +548,120 @@ fun NotePreview(note: Note, height: Dp, navController: NavController) {
 }
 
 
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun DateRangePickerModal(
-    onDateRangeSelected: (Pair<Long?, Long?>) -> Unit,
-    onDismiss: () -> Unit
+fun MultiSelectList(
+    allTags: Array<String>?,
+    selectedItems: Set<String>,
+    onSelectedItemsUpdate: (Set<String>) -> Unit
 ) {
-    val dateRangePickerState = rememberDateRangePickerState()
+    var expanded by remember { mutableStateOf(false) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp)
+    ) {
+        println(selectedItems)
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+            modifier = Modifier.weight(2f)
+        ) {
 
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onDateRangeSelected(
-                        Pair(
-                            dateRangePickerState.selectedStartDateMillis,
-                            dateRangePickerState.selectedEndDateMillis
-                        )
+            TextField(
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.surface,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.surface,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                    cursorColor = MaterialTheme.colorScheme.onSurface
+                ),
+                value = "Tags",
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier
+                    .menuAnchor(
+                        type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                        enabled = true
                     )
-                    onDismiss()
-                }
+                    .height(50.dp)
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                containerColor = MaterialTheme.colorScheme.surface
             ) {
-                Text("OK")
+                allTags?.forEach { option ->
+                    if (!selectedItems.contains(option)) {
+                        DropdownMenuItem(
+                            colors = MenuItemColors(
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                                leadingIconColor = MaterialTheme.colorScheme.onSurface,
+                                trailingIconColor = MaterialTheme.colorScheme.onSurface,
+                                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+                                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface
+                            ),
+                            text = { Text(option) },
+//
+                            onClick = {
+                                onSelectedItemsUpdate(
+                                    if (selectedItems.contains(option)) {
+
+                                        selectedItems - option
+                                    } else {
+                                        selectedItems + option
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
             }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
+
+
+        }
+        val scrollState = rememberScrollState()
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .height(80.dp)
+        ) {
+            FlowRow(
+
+                modifier = Modifier
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                allTags?.forEach { tag ->
+                    if (selectedItems.contains(tag)) {
+
+
+                        AssistChip(
+                            onClick = { onSelectedItemsUpdate(selectedItems - tag)},
+                            label = { Text(tag, color = MaterialTheme.colorScheme.onSurface) },
+                            colors = ChipColors(
+                                labelColor = MaterialTheme.colorScheme.onSurface,
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                leadingIconContentColor = MaterialTheme.colorScheme.onSurface,
+                                trailingIconContentColor = MaterialTheme.colorScheme.onSurface,
+                                disabledContainerColor = MaterialTheme.colorScheme.onSurface,
+                                disabledLabelColor = MaterialTheme.colorScheme.onSurface,
+                                disabledLeadingIconContentColor = MaterialTheme.colorScheme.onSurface,
+                                disabledTrailingIconContentColor = MaterialTheme.colorScheme.onSurface
+                            )
+                        )
+                    }
+                }
             }
         }
-    ) {
-        DateRangePicker(
-            state = dateRangePickerState,
-            colors = DatePickerDefaults.colors(
-                dayContentColor = Color.Gray,
-                selectedDayContentColor = Color.White,
-                selectedDayContainerColor = Color(0xFF6200EE),
-                todayContentColor = Color.Red,
-                todayDateBorderColor = Color.Red
-            ),
-            title = {
-                Text("Select date range")
-            },
-            showModeToggle = false,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(500.dp)
-                .padding(16.dp)
-        )
     }
 }
 

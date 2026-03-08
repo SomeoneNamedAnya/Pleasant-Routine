@@ -4,12 +4,12 @@ import com.coursework.pleasantroutineui.domain.Note
 import com.coursework.pleasantroutineui.domain.User
 import com.coursework.pleasantroutineui.repo.interfaces.INotesRepo
 
-class TestNoteRepo: INotesRepo {
+class TestCommonNoteRepo: INotesRepo {
     val users: TestUsers = TestUsers()
     val notes2 = arrayOf(
         Note(
             "q",
-            listOf(users.usersArr[0]),
+            listOf(users.usersArr[0], users.usersArr[1]),
             "2026-02-0q8",
             "2026-02-0q8",
             "Просто выходныеqqqqq",
@@ -22,7 +22,7 @@ class TestNoteRepo: INotesRepo {
     val notes1 = arrayOf(
         Note(
             "1",
-            listOf(users.usersArr[0]),
+            listOf(users.usersArr[0], users.usersArr[1], users.usersArr[2]),
             "2026-02-08",
             "2026-02-08",
             "Просто выходные",
@@ -48,7 +48,7 @@ class TestNoteRepo: INotesRepo {
         ),
         Note(
             "2",
-            listOf(users.usersArr[0]),
+            listOf(users.usersArr[1]),
             "2026-02-06",
             "2026-02-06",
             "Веселая пятница",
@@ -58,7 +58,7 @@ class TestNoteRepo: INotesRepo {
         ),
         Note(
             "3",
-            listOf(users.usersArr[0]),
+            listOf(users.usersArr[2]),
             "2026-02-09",
             "2026-02-09",
             "Веселая пятница2",
@@ -68,7 +68,7 @@ class TestNoteRepo: INotesRepo {
         ),
         Note(
             "4",
-            listOf(users.usersArr[0]),
+            listOf(users.usersArr[1], users.usersArr[2]),
             "2026-02-16",
             "2026-02-16",
             "Веселая пятница4",
@@ -103,6 +103,6 @@ class TestNoteRepo: INotesRepo {
 
     override fun getAllUsers(id: String): Array<User> {
 
-        return arrayOf(users.usersArr[0])
+        return users.usersArr
     }
 }

@@ -1,10 +1,8 @@
-package com.coursework.pleasantroutineui
+package com.coursework.pleasantroutineui.vm_factories
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.coursework.pleasantroutineui.pages.profile.AllUserInfoViewModel
 import com.coursework.pleasantroutineui.pages.room.PersonalArchivePageViewModel
-import com.coursework.pleasantroutineui.repo.interfaces.IAccountRepo
 import com.coursework.pleasantroutineui.repo.interfaces.INotesRepo
 
 class PersonalArchivePageViewModelFactory(

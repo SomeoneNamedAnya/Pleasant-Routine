@@ -185,7 +185,7 @@ fun MainRoomScreen(navController: NavController, vm: MainRoomPageViewModel) {
                 Button(
                     "Архив",
                     R.drawable.archive_common,
-                    Destinations.COMMON_ARCHIVE_PAGE.title
+                    Destinations.COMMON_ARCHIVE_PAGE.title + "/0"
                 ),
 
                 Button(

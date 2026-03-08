@@ -84,6 +84,11 @@ fun DrawerContent(
         MenuList(navController, Destinations.USER_ACCOUNT_PAGE.title,"Профиль")
         MenuList(navController, Destinations.USER_ROOM_PAGE.title, "Моя комната")
         MenuList(navController, Destinations.PERSONAL_ARCHIVE_PAGE.title + "/0", "Личный архив")
+        MenuList(navController, Destinations.COMMON_ARCHIVE_PAGE.title + "/0", "Общий архив")
+        MenuList(navController, Destinations.DESK_PAGE.title + "/0", "Доска задач")
+        MenuList(navController, Destinations.ROOM_CHAT_PAGE.title + "/1/0", "Чат комнаты")
+        MenuList(navController, Destinations.PUBLIC_ROOM_PAGE.title + "/C081/0", "Страница комнаты")
+
         MenuList(navController, Destinations.LOGIN_PAGE.title, "Вход")
 
     }

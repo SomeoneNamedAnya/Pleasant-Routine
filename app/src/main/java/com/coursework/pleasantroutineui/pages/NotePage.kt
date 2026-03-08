@@ -112,9 +112,6 @@ class NotePageViewModel (
 
 @Composable
 fun NotePage(id: String, navController: NavController, vm: NotePageViewModel) {
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp
-    val screenWidth = configuration.screenWidthDp.dp
 
     val note by vm.getNote.observeAsState()
     vm.loadNoteId(id)

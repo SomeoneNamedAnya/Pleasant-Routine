@@ -10,5 +10,6 @@ enum class Destinations(val title: String){
     ROOM_CHAT_PAGE("roomChatPage"),
     COMMON_ARCHIVE_PAGE("commonArchivePage"),
     PERSONAL_ARCHIVE_PAGE("personalArchivePage"),
-    NOTE_PAGE("notePage")
+    NOTE_PAGE("notePage"),
+    DESK_PAGE("deskPage")
 }
