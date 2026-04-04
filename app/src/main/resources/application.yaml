@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/pleasant_routine_db
+    username: postgres
+    password: 12345
+    driver-class-name: org.postgresql.Driver
+server:
+  port: 8081
+
+jwt:
+  secret: ${SECRET}
+  access:
+    expiration: 900000   # 15 мин
+  refresh:
+    expiration: 604800000 # 7 дней
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2.server.authorization: DEBUG
