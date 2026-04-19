@@ -89,7 +89,7 @@ fun DrawerContent(
         MenuList(navController, Destinations.ROOM_CHAT_PAGE.title + "/1/0", "Чат комнаты")
         MenuList(navController, Destinations.PUBLIC_ROOM_PAGE.title + "/C081/0", "Страница комнаты")
 
-        MenuList(navController, Destinations.LOGIN_PAGE.title, "Вход")
+        MenuList(navController, Destinations.LOGOUT_PAGE.title, "Вход")
 
     }
 }

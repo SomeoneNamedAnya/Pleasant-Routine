@@ -1,10 +1,11 @@
 package com.coursework.pleasantroutineui.domain
 @JvmRecord
 data class RoomInfo(
-    val roomNumber: String,
-    val dormitoryName: String,
-    val publicDescription: String,
-    val roomRules: String,
-    val photoLinks: List<String>,
-    val residents: List<User>
+    val id: String?,
+    val number: String?,
+    val dormitoryId: String?,
+    val publicInfo: String?,
+    val privateInfo: String?,
+    val publicPhotoLink: String?,
+    val residents: List<User>?
 )

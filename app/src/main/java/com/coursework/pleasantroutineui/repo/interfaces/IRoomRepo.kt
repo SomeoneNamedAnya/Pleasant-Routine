@@ -5,6 +5,7 @@ import com.coursework.pleasantroutineui.domain.User
 
 interface IRoomRepo {
 
-    fun getAllRoommates(numOfRoom: String): Array<User>
-    fun getRoomInfo(numOfRoom: String): RoomInfo
+    suspend fun getRoomInfo(): RoomInfo
+    suspend fun signedLink(link: String): String
+
 }

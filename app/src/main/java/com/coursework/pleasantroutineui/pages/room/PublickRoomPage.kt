@@ -137,97 +137,97 @@ fun PublicRoomPage(
     viewModel: PublicRoomViewModel
 ) {
 
-    LaunchedEffect(Unit) {
-        viewModel.load(roomNumber)
-    }
-
-    val room = viewModel.roomInfo ?: return
-    val notes = viewModel.notes
-
-    val isResident = room.residents.any { it.id == currentUserId }
-    Menue("Моя комната", false, navController) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-
-            item { RoomHeader(room) }
-
-            item { ResidentsList(room.residents, navController) }
-
-            item { RoomDescription(room) }
-
-            if (isResident) {
-                item { AddNoteButton() }
-            }
-
-            items(notes) {
-                NoteCard(it, navController)
-            }
-
-        }
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.load(roomNumber)
+//    }
+//
+//    val room = viewModel.roomInfo ?: return
+//    val notes = viewModel.notes
+//
+//    val isResident = room.residents.any { it.id == currentUserId }
+//    Menue("Моя комната", false, navController) { paddingValues ->
+//        LazyColumn(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(paddingValues)
+//                .background(MaterialTheme.colorScheme.background)
+//        ) {
+//
+//            item { RoomHeader(room) }
+//
+//            item { ResidentsList(room.residents, navController) }
+//
+//            item { RoomDescription(room) }
+//
+//            if (isResident) {
+//                item { AddNoteButton() }
+//            }
+//
+//            items(notes) {
+//                NoteCard(it, navController)
+//            }
+//
+//        }
+//    }
 }
 @Composable
 fun RoomDescription(room: RoomInfo) {
 
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-
-        Text(
-            text = "About room",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        Spacer(Modifier.height(6.dp))
-
-        Text(
-            text = room.publicDescription,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-    }
+//    Column(
+//        modifier = Modifier
+//            .padding(16.dp)
+//            .background(MaterialTheme.colorScheme.background)
+//    ) {
+//
+//        Text(
+//            text = "About room",
+//            style = MaterialTheme.typography.titleMedium,
+//            color = MaterialTheme.colorScheme.onBackground
+//        )
+//
+//        Spacer(Modifier.height(6.dp))
+//
+//        Text(
+//            text = room.publicDescription,
+//            style = MaterialTheme.typography.bodyMedium,
+//            color = MaterialTheme.colorScheme.onBackground
+//        )
+//    }
 }
 @Composable
 fun RoomHeader(room: RoomInfo) {
 
-    Column(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(bottom = 12.dp)
-    ) {
-
-        AsyncImage(
-            model = room.photoLinks.firstOrNull(),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        Text(
-            text = "Room ${room.roomNumber}",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-
-        Text(
-            text = room.dormitoryName,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-    }
+//    Column(
+//        modifier = Modifier
+//            .background(MaterialTheme.colorScheme.surface)
+//            .padding(bottom = 12.dp)
+//    ) {
+//
+//        AsyncImage(
+//            model = room.photoLinks.firstOrNull(),
+//            contentDescription = null,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .height(220.dp),
+//            contentScale = ContentScale.Crop
+//        )
+//
+//        Spacer(Modifier.height(8.dp))
+//
+//        Text(
+//            text = "Room ${room.roomNumber}",
+//            style = MaterialTheme.typography.headlineMedium,
+//            color = MaterialTheme.colorScheme.onSurface,
+//            modifier = Modifier.padding(horizontal = 16.dp)
+//        )
+//
+//        Text(
+//            text = room.dormitoryName,
+//            style = MaterialTheme.typography.bodyLarge,
+//            color = MaterialTheme.colorScheme.secondary,
+//            modifier = Modifier.padding(horizontal = 16.dp)
+//        )
+//    }
 }
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -285,7 +285,7 @@ fun ResidentItem(
         )
 
         Text(
-            text = user.firstName,
+            text = user.firstName ?: "",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onBackground
         )

@@ -1,15 +1,20 @@
 package com.coursework.pleasantroutineui.pages.profile
 
 import android.content.ClipData
+import android.net.Uri
 import android.util.Log
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -20,11 +25,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,40 +38,71 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.coursework.pleasantroutineui.ui_services.DrawerContent
-import com.coursework.pleasantroutineui.ui_services.ProfileTopBar
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.coursework.pleasantroutineui.R
+import com.coursework.pleasantroutineui.domain.User
 import com.coursework.pleasantroutineui.repo.interfaces.IAccountRepo
+import com.coursework.pleasantroutineui.repo.prod.IUserRepo
 import com.coursework.pleasantroutineui.ui_services.InfoRow
 import com.coursework.pleasantroutineui.ui_services.Menue
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class AccountInfoViewModel @Inject constructor(
+    private val repository: IUserRepo
+): ViewModel(){
+
+    private val _user = MutableStateFlow<User?>(null)
+    val user: StateFlow<User?> = _user
+
+    fun loadUser(id: String) {
+        viewModelScope.launch {
+            _user.value = repository.getUser(id)
+        }
+    }
 
 
-class AccountInfoViewModel (
-    private val repository: IAccountRepo
-): ViewModel() {
+    fun refreshSignedUrl(link: String) {
+        viewModelScope.launch {
+            if (link != "") {
 
-    var user = liveData {
-        emit(repository.getUser("0"))
+                val linkSign: String = repository.signedLink(link)
+                _user.value = _user.value?.copy(signedLink = linkSign)
+            }
+
+        }
     }
 
 
 }
 
 @Composable
-fun AccountInfoScreen(navController: NavController, vm: AccountInfoViewModel) {
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+fun AccountInfoScreen(id: String?, navController: NavController, vm: AccountInfoViewModel) {
+
+    LaunchedEffect(Unit) {
+        if (id != null) {
+            vm.loadUser(id)
+        }
+    }
+    val user by vm.user.collectAsState()
 
     Menue("Информация", false, navController) { paddingValues ->
         Column(
@@ -78,12 +114,10 @@ fun AccountInfoScreen(navController: NavController, vm: AccountInfoViewModel) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 50.dp, bottom = 20.dp)
                     .background(MaterialTheme.colorScheme.background),
                 horizontalAlignment = Alignment.CenterHorizontally
 
             ) {
-                val user by vm.user.observeAsState()
                 val photoLink by remember(user) {
                     derivedStateOf { user?.photoLink }
                 }
@@ -112,64 +146,118 @@ fun AccountInfoScreen(navController: NavController, vm: AccountInfoViewModel) {
                     derivedStateOf { user?.educationLevel}
                 }
                 val userSelfInfo by remember(user) {
-                    derivedStateOf { user?.selfInfo}
+                    derivedStateOf { user?.about}
                 }
 
 
                 val clipboard = LocalClipboard.current
                 val scope = rememberCoroutineScope()
-                Spacer(modifier = Modifier.height(15.dp))
-                AsyncImage(
-                    model = photoLink,
-                    onError = {
-                        Log.e(
-                            "AsyncImage",
-                            "Failed to load image: ${it.result.throwable}"
-                        )
-                    },
-                    contentDescription = "Example Image",
-                    contentScale = ContentScale.Crop,
+                Box(
                     modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape),
-                    placeholder = painterResource(id = R.drawable.no_photo), // Replace with your placeholder drawable
-                    error = painterResource(id = R.drawable.no_photo)  // Replace with your error drawable
-                )
+                        .fillMaxWidth()
+                        .height(250.dp)
+                ) {
 
-                Spacer(modifier = Modifier.height(15.dp))
-                userId?.let {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(user?.signedLink ?: "")
+                            .diskCacheKey(buildImageCacheKey(user?.id, user?.photoLink))
+                            .memoryCacheKey(buildImageCacheKey(user?.id, user?.photoLink))
+                            .memoryCachePolicy(CachePolicy.ENABLED)
+                            .diskCachePolicy(CachePolicy.ENABLED)
+                            .networkCachePolicy(CachePolicy.ENABLED)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .matchParentSize(),
+                        error = painterResource(R.drawable.no_photo),
+                        placeholder = painterResource(R.drawable.no_photo),
+                        onError = {
+                            vm.refreshSignedUrl(user?.photoLink ?: "")
+                        }
+                    )
 
-                        ) {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            style = MaterialTheme.typography.titleSmall
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(Color.Black.copy(alpha = 0.7f))
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .size(120.dp)
+                            .align(Alignment.BottomCenter)
+                            .offset(y = 60.dp)
+                    ) {
+                        println("photo_link")
+                        println(user?.photoLink)
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(user?.signedLink ?: "")
+                                .diskCacheKey(buildImageCacheKey(user?.id, user?.photoLink))
+                                .memoryCacheKey(buildImageCacheKey(user?.id, user?.photoLink))
+                                .memoryCachePolicy(CachePolicy.ENABLED)
+                                .diskCachePolicy(CachePolicy.ENABLED)
+                                .networkCachePolicy(CachePolicy.ENABLED)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .matchParentSize()
+                                .clip(CircleShape),
+                            error = painterResource(R.drawable.no_photo),
+                            placeholder = painterResource(R.drawable.no_photo),
+                            onError = {
+                                println("WHY?????????")
+                                vm.refreshSignedUrl(user?.photoLink ?: "")
+                            }
                         )
-                        IconButton(
-                            onClick = {
-                                scope.launch {
-                                    clipboard.setClipEntry(
-                                        ClipEntry(
-                                            ClipData.newPlainText(
-                                                it,
-                                                it
+
+                    }
+
+
+                }
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                user?.id?.let { id ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Spacer(modifier = Modifier.weight(1f))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = id,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+
+
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        clipboard.setClipEntry(
+                                            ClipEntry(
+                                                ClipData.newPlainText(id, id)
                                             )
                                         )
-                                    )
+                                    }
                                 }
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.outline_content_copy_24),
+                                    contentDescription = "Скопировать",
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.outline_content_copy_24),
-                                contentDescription = "Скопировать",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
 
+
+                        }
                     }
                 }
 

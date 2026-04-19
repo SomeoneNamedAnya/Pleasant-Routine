@@ -15,16 +15,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.coursework.pleasantroutineui.R
 import com.coursework.pleasantroutineui.domain.Destinations
 import com.coursework.pleasantroutineui.domain.User
+import com.coursework.pleasantroutineui.pages.profile.buildImageCacheKey
 
 @Composable
-fun RoomUserPreview(user: User, navController: NavController) {
+fun RoomUserPreview(user: User,
+                    navController: NavController,
+                    refreshSignedUrl: () -> Unit) {
     Row(
 
         modifier = Modifier
@@ -37,8 +43,17 @@ fun RoomUserPreview(user: User, navController: NavController) {
     ) {
         println(user.photoLink)
         AsyncImage(
-            model = user.photoLink,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(user.signedLink ?: "")
+                .diskCacheKey(buildImageCacheKey(user.id, user.photoLink))
+                .memoryCacheKey(buildImageCacheKey(user.id, user.photoLink))
+                .memoryCachePolicy(CachePolicy.ENABLED)
+                .diskCachePolicy(CachePolicy.ENABLED)
+                .networkCachePolicy(CachePolicy.ENABLED)
+                .crossfade(true)
+                .build(),
             onError = {
+                refreshSignedUrl()
                 Log.e(
                     "AsyncImage",
                     "Failed to load image: ${it.result.throwable}"
@@ -49,14 +64,14 @@ fun RoomUserPreview(user: User, navController: NavController) {
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape),
-            placeholder = painterResource(id = R.drawable.no_photo), // Replace with your placeholder drawable
-            error = painterResource(id = R.drawable.no_photo)  // Replace with your error drawable
+            placeholder = painterResource(id = R.drawable.no_photo),
+            error = painterResource(id = R.drawable.no_photo)
         )
 
         Spacer(modifier = Modifier.width(15.dp))
 
         Text(
-            text = user.selfInfo,
+            text = user.about ?: "",
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.titleSmall,
             modifier = Modifier

@@ -11,5 +11,9 @@ enum class Destinations(val title: String){
     COMMON_ARCHIVE_PAGE("commonArchivePage"),
     PERSONAL_ARCHIVE_PAGE("personalArchivePage"),
     NOTE_PAGE("notePage"),
-    DESK_PAGE("deskPage")
+    DESK_PAGE("deskPage"),
+
+    EVENT_PAGE("eventPage"),
+    FAST_PAGE("fastPage"),
+    LOGOUT_PAGE("logoutPage")
 }

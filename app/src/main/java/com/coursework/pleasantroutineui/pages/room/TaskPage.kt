@@ -207,9 +207,9 @@ fun ParticipantsSection(task: Task) {
         Spacer(Modifier.height(8.dp))
 
         Text("Наблюдатели", style = MaterialTheme.typography.titleMedium)
-        task.watchers.forEach {
-            UserRow(it)
-        }
+            //task.watchers.forEach {
+          //  UserRow(it)
+        //}
     }
 }
 @Composable

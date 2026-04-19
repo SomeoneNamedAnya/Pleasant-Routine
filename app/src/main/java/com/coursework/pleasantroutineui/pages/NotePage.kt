@@ -82,10 +82,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
-import androidx.wear.compose.material.Chip
-import androidx.wear.compose.material.ChipColors
-import androidx.wear.compose.material.ChipDefaults
-import androidx.wear.compose.material.ChipDefaults.primaryChipColors
+//import androidx.wear.compose.material.Chip
+//import androidx.wear.compose.material.ChipColors
+//import androidx.wear.compose.material.ChipDefaults
+//import androidx.wear.compose.material.ChipDefaults.primaryChipColors
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.coursework.pleasantroutineui.R
@@ -153,7 +153,7 @@ fun NotePage(id: String, navController: NavController, vm: NotePageViewModel) {
                 collapsedContent = {
                     FlowRow {
                         note!!.tags.take(4).forEach {
-                            Chip(
+                            /*Chip(
                                 colors = primaryChipColors(
                                     contentColor = MaterialTheme.colorScheme.onSurface,
                                     backgroundColor = MaterialTheme.colorScheme.surface,
@@ -161,13 +161,15 @@ fun NotePage(id: String, navController: NavController, vm: NotePageViewModel) {
                                     iconColor = MaterialTheme.colorScheme.onSurface,
                                 ),
                                 onClick = {}, label = { Text(it, color = MaterialTheme.colorScheme.onSurface) })
+
+                             */
                         }
                     }
                 },
                 expandedContent = {
                     FlowRow {
                         note!!.tags.forEach {
-                            Chip(
+                           /* Chip(
                                 colors = primaryChipColors(
                                     contentColor = MaterialTheme.colorScheme.onSurface,
                                     backgroundColor = MaterialTheme.colorScheme.surface,
@@ -175,6 +177,8 @@ fun NotePage(id: String, navController: NavController, vm: NotePageViewModel) {
                                     iconColor = MaterialTheme.colorScheme.onSurface,
                                 ),
                                 onClick = {}, label = { Text(it, color = MaterialTheme.colorScheme.onSurface) })
+
+                            */
                         }
                     }
                 }
