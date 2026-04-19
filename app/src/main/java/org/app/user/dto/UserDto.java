@@ -25,5 +25,7 @@ public class UserDto {
     private LocalDateTime deletedAt;
     private String photoLink;
     private String about;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 
 }

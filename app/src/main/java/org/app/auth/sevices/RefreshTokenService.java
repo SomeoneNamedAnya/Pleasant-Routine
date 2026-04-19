@@ -3,6 +3,7 @@ package org.app.auth.sevices;
 import org.app.auth.domain.RefreshToken;
 import org.app.auth.domain.UserPasswordInfo;
 import org.app.auth.repository.RefreshTokenRepository;
+import org.app.properties.JwtProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,13 +13,16 @@ import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
-    @Value("${jwt.refresh.expiration}")
-    private long refreshExpiration;
+    private JwtProperties jwtProperties;
+
+    private final long refreshExpiration;
 
     private final RefreshTokenRepository repository;
 
-    public RefreshTokenService(RefreshTokenRepository repository) {
+    public RefreshTokenService(JwtProperties jwtProperties, RefreshTokenRepository repository) {
+        this.jwtProperties = jwtProperties;
         this.repository = repository;
+        this.refreshExpiration = jwtProperties.getRefresh().getExpiration();
     }
 
     public RefreshToken createRefreshToken(UserPasswordInfo user) {

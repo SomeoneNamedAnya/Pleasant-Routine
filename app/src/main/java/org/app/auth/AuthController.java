@@ -35,21 +35,28 @@ public class AuthController {
         }
 
     }
+
+
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestBody RefreshRequest req) {
         authService.logout(req.refreshToken());
         return ResponseEntity.noContent().build();
     }
 
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         try {
+            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
             AuthResponse authResponse = authService.login(req);
             return ResponseEntity.ok(authResponse);
         } catch (BadCredentialsException exception) {
+            System.out.println(exception.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid credentials"));
         } catch (RuntimeException exception) {
+            System.out.println(exception.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid refresh token"));
         }

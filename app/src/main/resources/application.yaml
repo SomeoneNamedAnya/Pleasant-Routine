@@ -14,6 +14,10 @@ jwt:
   refresh:
     expiration: 604800000 # 7 дней
 
+storage:
+  access: ${STORAGE_ACCESS_TOKEN}
+  secret: ${STORAGE_SECRET_TOKEN}
+
 logging:
   level:
     org.springframework.security: DEBUG

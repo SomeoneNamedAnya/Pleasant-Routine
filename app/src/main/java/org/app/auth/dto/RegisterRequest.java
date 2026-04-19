@@ -1,14 +1,14 @@
 package org.app.auth.dto;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 public record RegisterRequest(
         String email,
-        String password,
         String name,
         String surname,
         String lastName,
-        LocalDate dateOfBirth,
+        Date dateOfBirth,
         String role,
         int educationId,
         int roomId

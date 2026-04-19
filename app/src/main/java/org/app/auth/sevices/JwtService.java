@@ -4,6 +4,7 @@ import org.app.auth.domain.UserPasswordInfo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.app.properties.JwtProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +15,20 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
+    private JwtProperties jwtProperties;
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-    @Value("${jwt.access.expiration}")
-    private long jwtExpiration;
+    private final String secretKey;
+
+    private final long jwtExpiration;
+
+    public JwtService(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        secretKey = jwtProperties.getSecret();
+        jwtExpiration = jwtProperties.getAccess().getExpiration();
+    }
 
     public String generateToken(UserPasswordInfo user, String role) {
+        System.out.println("SECRETKEY=<" + secretKey + ">");
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claim("userId", user.getId().toString())
@@ -39,7 +47,7 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
     public Long extractUserId(String token) {
-        return extractClaim(token, claims -> claims.get("userId", Long.class));
+        return Long.parseLong(extractClaim(token, claims -> claims.get("userId", String.class)));
     }
     public String extractUserRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));

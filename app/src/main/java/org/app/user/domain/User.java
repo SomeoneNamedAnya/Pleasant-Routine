@@ -3,6 +3,8 @@ package org.app.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.app.room.domain.RoomInfo;
+import org.app.user.dto.UserDto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,8 +35,10 @@ public class User {
 
     @Column(name = "education_id")
     private Long educationId;
-    @Column(name = "room_id")
-    private Long roomId;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private RoomInfo roomId;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -48,4 +52,23 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+
+    public UserDto toUserDto() {
+        return new UserDto(
+                id,
+                name,
+                surname,
+                lastName,
+                dateOfBirth,
+                email,
+                educationId,
+                roomId.getId(),
+                createdAt,
+                deletedAt,
+                photoLink,
+                about,
+                role
+        );
+    }
 }

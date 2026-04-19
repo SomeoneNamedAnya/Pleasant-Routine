@@ -1,31 +1,179 @@
--- Таблица для хранения информации для входа (пароль, email)
-CREATE TABLE User_password_info (
-    id UUID PRIMARY KEY,
+----------------------------
+-- Инфраструктура
+----------------------------
+CREATE TABLE university (
+    id SERIAL PRIMARY KEY,
+    name TEXT
+);
+
+CREATE TABLE dormitory (
+    id SERIAL PRIMARY KEY,
+	code TEXT,
+    name TEXT,
+	region TEXT,
+	city TEXT,
+    university_id INT REFERENCES university(id)
+);
+
+CREATE TABLE room (
+    id SERIAL PRIMARY KEY,
+    number TEXT,
+    dormitory_id INT REFERENCES dormitory(id),
+	public_info TEXT,
+	private_info TEXT,
+	public_photo_link TEXT
+);
+
+
+CREATE TABLE education_program (
+    id SERIAL PRIMARY KEY,
+	code TEXT,
+    name TEXT,
+	qualification TEXT,
+	level TEXT
+);
+
+----------------------------
+-- Пользователь
+----------------------------
+
+CREATE TABLE user_info (
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    surname TEXT,
+    last_name TEXT,
+    date_of_birth DATE,
+    email TEXT UNIQUE,
+    education_id INT REFERENCES education_program(id),
+    room_id INT REFERENCES room(id),
+    created_at TIMESTAMP,
+    deleted_at TIMESTAMP,
+	photo_link TEXT,
+	about TEXT,
+    role TEXT
+);
+
+CREATE TABLE user_password_info (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES user_info(id) ON DELETE CASCADE,
     email VARCHAR(255) UNIQUE NOT NULL,
     hash_password VARCHAR(255) NOT NULL,
+    has_to_change BOOLEAN NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-;
+);
+
 CREATE TABLE refresh_tokens (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES User_password_info(id) ON DELETE CASCADE,
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES user_password_info(id) ON DELETE CASCADE,
     token VARCHAR(512) UNIQUE NOT NULL,
     expiry_date TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Основная информация о пользователе
-CREATE TABLE User_info (
-    id UUID PRIMARY KEY REFERENCES User_password_info(id) ON DELETE CASCADE,
-    name VARCHAR(100),
-    surname VARCHAR(100),
-    last_name VARCHAR(100),
-    date_of_birth DATE,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    education_id INT,
-    room_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP DEFAULT NULL,
-    role VARCHAR(50)
+CREATE TABLE student_living (
+	id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES user_info(id),
+    dormitory_id INT REFERENCES dormitory(id),
+	started_at TIMESTAMP,
+	ended_at TIMESTAMP
+);
+
+----------------------------
+-- Чат
+----------------------------
+
+CREATE TABLE chat (
+    id SERIAL PRIMARY KEY,
+	start_at TIMESTAMP,
+	ended_at TIMESTAMP,
+	title TEXT,
+	creator INT REFERENCES user_info(id)
+);
+
+CREATE TABLE chat_participant (
+	id SERIAL PRIMARY KEY,
+    chat_id INT REFERENCES chat(id),
+    user_id INT REFERENCES user_info(id)
+
+);
+
+CREATE TABLE message_in_chat (
+	id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES user_info(id),
+    chat_id INT REFERENCES chat(id),
+    start_dt TIMESTAMP,
+    message TEXT
+);
+
+----------------------------
+-- Заметки
+----------------------------
+
+CREATE TABLE note (
+    id SERIAL PRIMARY KEY,
+	title TEXT,
+    content TEXT,
+	is_public TEXT,
+	is_archived TEXT,
+	room_id TEXT,
+	creator_id INT REFERENCES user_info(id),
+    created_at TIMESTAMP
+);
+
+CREATE TABLE co_author_note (
+	id SERIAL PRIMARY KEY,
+    note_id INT REFERENCES note(id),
+    user_id INT REFERENCES user_info(id)
+
+);
+
+CREATE TABLE photo_note (
+    note_id INT REFERENCES note(id) PRIMARY KEY,
+    photo_link TEXT
+);
+
+----------------------------
+-- Задачи
+----------------------------
+
+CREATE TABLE task (
+    id SERIAL PRIMARY KEY,
+    create_at TIMESTAMP,
+    deadline TIMESTAMP,
+    title TEXT,
+    description TEXT,
+    type TEXT,
+    status TEXT,
+    room_id INT REFERENCES room(id)
+);
+
+CREATE TABLE task_creator (
+	id SERIAL PRIMARY KEY,
+    task_id INT REFERENCES task(id),
+    user_id INT REFERENCES user_info(id)
+
+);
+
+CREATE TABLE task_performer (
+	id SERIAL PRIMARY KEY,
+    task_id INT REFERENCES task(id),
+    user_id INT REFERENCES user_info(id)
+
+);
+
+CREATE TABLE task_watcher (
+	id SERIAL PRIMARY KEY,
+    task_id INT REFERENCES task(id),
+    user_id INT REFERENCES user_info(id)
+
+);
+
+CREATE TABLE task_comment (
+	id SERIAL PRIMARY KEY,
+    task_id INT REFERENCES task(id),
+    user_id INT REFERENCES user_info(id),
+    comment TEXT,
+    created_at TIMESTAMP
+
 );

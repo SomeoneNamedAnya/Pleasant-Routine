@@ -24,6 +24,14 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserPasswordInfoRepository userRepo;
+    private static final List<String> PUBLIC_URLS = List.of(
+            "/auth/login",
+            "/refresh"
+    );
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return PUBLIC_URLS.contains(request.getServletPath());
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -38,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String jwt = authHeader.substring(7);
         Long userId = jwtService.extractUserId(jwt);
         String role = jwtService.extractUserRole(jwt);
+        System.out.println(userId);
 
         if (userId != null && role != null && jwtService.isTokenValid(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
             CustomUserDetails userDetails = new CustomUserDetails(userId, role);

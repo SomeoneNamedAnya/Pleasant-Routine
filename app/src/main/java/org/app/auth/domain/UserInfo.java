@@ -1,34 +1,49 @@
 package org.app.auth.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "User_info")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserInfo {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "id")
-    private UserPasswordInfo userPasswordInfo;
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
     private String surname;
+    @Column(name = "last_name")
     private String lastName;
+    @Column(name = "date_of_birth")
     private Date dateOfBirth;
     @Column(unique = true)
     private String email;
+    @Column(name = "education_id")
     private Integer educationId;
+    @Column(name = "room_id")
     private Integer roomId;
+    @Column(name = "role")
     private String role;
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    public UserInfo(String name, String surname, String lastName,
+                    Date dateOfBirth, String email, Integer educationId,
+                    Integer roomId, String role) {
+        this.name = name;
+        this.surname = surname;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.educationId = educationId;
+        this.roomId = roomId;
+        this.role = role;
+    }
 }
