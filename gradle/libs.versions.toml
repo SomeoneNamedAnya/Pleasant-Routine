@@ -34,6 +34,7 @@ uiText = "1.10.6"
 foundationLayoutVersion = "1.10.6"
 foundationVersion = "1.10.6"
 room = "2.6.1"
+androidxFoundation = "1.11.0"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
@@ -81,6 +82,7 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 # ROOM DEPENDENCIES - ADD THESE:
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "androidxFoundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
