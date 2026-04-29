@@ -307,13 +307,11 @@ fun ParticipantsSection(task: Task, vm: TaskPageViewModel) {
 
     Column(Modifier.padding(8.dp)) {
 
-        // Создатель
         Text("Создатель", style = MaterialTheme.typography.titleMedium)
         UserShortRow(task.creator)
 
         Spacer(Modifier.height(8.dp))
 
-        // Исполнители
         Text("Исполнители", style = MaterialTheme.typography.titleMedium)
         if (task.performers.isEmpty()) {
             Text("Нет исполнителей", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
