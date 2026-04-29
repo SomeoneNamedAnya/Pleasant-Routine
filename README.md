@@ -1,2 +1,1 @@
-# Pleasant-Routine
-Coursework project, 3rd year
+Это серверная часть приложения
