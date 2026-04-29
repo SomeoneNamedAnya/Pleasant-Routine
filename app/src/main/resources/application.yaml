@@ -1,0 +1,45 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/pleasant_routine_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:12345}
+    driver-class-name: org.postgresql.Driver
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MY_EMAIL}
+    password: ${PASSWORD_EMAIL}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+server:
+  port: 8081
+
+app:
+  mail:
+    from: ${MY_EMAIL}
+
+jwt:
+  secret: ${SECRET}
+  access:
+    expiration: 9000000
+  refresh:
+    expiration: 604800000
+
+storage:
+  access: ${STORAGE_ACCESS_TOKEN}
+  secret: ${STORAGE_SECRET_TOKEN}
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2.server.authorization: DEBUG
