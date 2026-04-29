@@ -227,3 +227,23 @@ CREATE TABLE sharing_card (
     is_active   BOOLEAN NOT NULL DEFAULT TRUE,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+---------------------------------------
+-- некоторые данные для словарей
+---------------------------------------
+
+INSERT INTO  university (name)
+VALUES ('НИУ "Высшая школа экономики"');
+
+INSERT INTO  dormitory (code, name, region, city, university_id)
+VALUES ('12345', 'Общежитие №8 Трилистник', 'МО', 'Одинцово', 1);
+
+INSERT INTO  room (number, dormitory_id)
+VALUES ('C081', 1);
+
+INSERT INTO  education_program (code, name, qualification, level)
+VALUES ('09-03-04', 'Программная инженерия', 'Бакалавриат', '1 курс'),
+('09-03-04', 'Программная инженерия', 'Бакалавриат', '2 курс'),
+('09-03-04', 'Программная инженерия', 'Бакалавриат', '3 курс'),
+('09-03-04', 'Программная инженерия', 'Бакалавриат', '4 курс');
