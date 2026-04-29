@@ -1,0 +1,58 @@
+services:
+  pleasant_routine_db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: pleasant_routine_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d pleasant_routine_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  liquibase-migrations:
+    image: liquibase/liquibase:4.29
+    depends_on:
+      pleasant_routine_db:
+        condition: service_healthy
+    command:
+      - --searchPath=/changesets
+      - --changelog-file=master.xml
+      - --driver=org.postgresql.Driver
+      - --url=jdbc:postgresql://pleasant_routine_db:5432/pleasant_routine_db
+      - --username=postgres
+      - --password=12345
+      - update
+    volumes:
+      - ./migrations:/changesets
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      pleasant_routine_db:
+        condition: service_healthy
+      liquibase-migrations:
+        condition: service_completed_successfully
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pleasant_routine_db:5432/pleasant_routine_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 12345
+      MY_EMAIL: ${MY_EMAIL}
+      PASSWORD_EMAIL: ${PASSWORD_EMAIL}
+      SECRET: ${SECRET}
+      STORAGE_ACCESS_TOKEN: ${STORAGE_ACCESS_TOKEN}
+      STORAGE_SECRET_TOKEN: ${STORAGE_SECRET_TOKEN}
+
+volumes:
+  postgres_data:
