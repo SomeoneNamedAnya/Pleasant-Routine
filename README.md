@@ -9,4 +9,6 @@ email=fordlhomeworks@gmail.com
 password=12345!aaaa
 
 (Пожалуйста, не меняйте пароль)
-(но можно скачать и отсюда из ([папке](https://github.com/SomeoneNamedAnya/Pleasant-Routine/tree/client/app/release) гитхаба)
+
+
+(Можно скачать и отсюда из ([папке](https://github.com/SomeoneNamedAnya/Pleasant-Routine/tree/client/app/release) гитхаба)
